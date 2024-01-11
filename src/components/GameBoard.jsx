@@ -1,12 +1,8 @@
 import { useState } from "react";
 //settiamo il nostro game board iniziale, array multidimensionale
-const initialGameBoard = [
-  [null, null, null],
-  [null, null, null],
-  [null, null, null],
-];
+
 //qua dichiariamo la funzione che andremo ad esporre nel componente figlio
-function GameBoard({ onSelectSquare, turns }) {
+function GameBoard({ onSelectSquare, board }) {
   //   const [gameBoard, setGameBoard] = useState(initialGameBoard);
 
   //   const handleSelectSquare = (rowIndex, colIndex) => {
@@ -25,19 +21,9 @@ function GameBoard({ onSelectSquare, turns }) {
   //     onSelectSquare();
   //   };
 
-  let gameBoard = initialGameBoard;
-
-  for (let turn of turns) {
-    //destrutturo turn accedendo a square e player
-    const { square, player } = turn;
-    //destrutturo square e accedo a row e col
-    const { row, col } = square;
-    gameBoard[row][col] = player;
-  }
-
   return (
     <ol id="game-board">
-      {gameBoard.map((row, rowIndex) => (
+      {board.map((row, rowIndex) => (
         <li key={rowIndex}>
           <ol>
             {row.map((playerSymbol, colIndex) => (
