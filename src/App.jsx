@@ -74,7 +74,7 @@ function App() {
 
   const currentPlayer = deriveActivePlayer(gameTurns);
 
-  let gameBoard = initialGameBoard;
+  let gameBoard = [...initialGameBoard.map((innerArray) => [...innerArray])];
 
   for (let turn of gameTurns) {
     //destrutturo turn accedendo a square e player
@@ -125,7 +125,7 @@ function App() {
   }
 
   //funzione per resettare il gioco alla condizione iniziale, triggerata dal componente GameOver
-  const hanndleRestart = () => {
+  const handleRestart = () => {
     setGameTurns([]);
   };
 
@@ -145,7 +145,7 @@ function App() {
           />
         </ol>
         {(winner || hasDraw) && (
-          <GameOver winner={winner} onRestart={hanndleRestart} />
+          <GameOver winner={winner} onRestart={handleRestart} />
         )}
         <GameBoard
           onSelectSquare={handleSelectSquare}
