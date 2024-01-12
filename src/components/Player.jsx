@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Player({ initialName, symbol, isActive }) {
+function Player({ initialName, symbol, isActive, onNameChange }) {
   const [isEditing, setIsEditing] = useState(false);
   const [playerName, setPlayerName] = useState(initialName);
 
@@ -14,6 +14,11 @@ function Player({ initialName, symbol, isActive }) {
   const handleEditClick = () => {
     //serve per cambiare lo stato in maniera dinamica ed in tempo reale
     setIsEditing((editing) => !editing);
+
+    if (isEditing) {
+      //passiamo la funzione per cambiare i nomi con i parametri
+      onNameChange(symbol, playerName);
+    }
   };
 
   // dichiariamo nella variabile playerName lo span dove introdurre il nome del giocatore

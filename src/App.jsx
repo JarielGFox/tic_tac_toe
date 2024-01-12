@@ -53,7 +53,9 @@ const WINNING_COMBINATIONS = [
   ],
 ];
 
-//funzione helper per calcolare il giocatore attuale
+const PLAYERS = { X: "Player 1", O: "Player 2" };
+
+//funzione helper per calcolare il giocatore attuale (quello attivo)
 const deriveActivePlayer = (gameTurns) => {
   let currentPlayer = "X";
 
@@ -64,26 +66,7 @@ const deriveActivePlayer = (gameTurns) => {
   return currentPlayer;
 };
 
-function App() {
-  //const [activePlayer, setActivePlayer] = useState("X");
-
-  //stato per il log, all'inizio sarà un array vuoto
-  const [gameTurns, setGameTurns] = useState([]);
-  // si potrebbe usare un nuovo stato per controllare la combinazione vincente, ma non sarebbe best practice, invece usiamo il derive state
-  // const [hasWinner, setHasWinner] = useState(false);
-
-  const currentPlayer = deriveActivePlayer(gameTurns);
-
-  let gameBoard = [...initialGameBoard.map((innerArray) => [...innerArray])];
-
-  for (let turn of gameTurns) {
-    //destrutturo turn accedendo a square e player
-    const { square, player } = turn;
-    //destrutturo square e accedo a row e col
-    const { row, col } = square;
-    gameBoard[row][col] = player;
-  }
-
+function deriveWinner(gameBoard, players) {
   let winner = null;
 
   //qua usiamo il lifting dello state derivato
@@ -100,11 +83,50 @@ function App() {
       firstSquareSymbol === secondSquareSymbol &&
       firstSquareSymbol === thirdSquareSymbol
     ) {
-      winner = firstSquareSymbol;
+      winner = players[firstSquareSymbol];
     }
   }
+  //funzione esternalizzata senza return non funzionerà mai
+  return winner;
+}
 
+function deriveGameBoard(gameTurns) {
+  let gameBoard = [...initialGameBoard.map((innerArray) => [...innerArray])];
+
+  for (let turn of gameTurns) {
+    //destrutturo turn accedendo a square e player
+    const { square, player } = turn;
+    //destrutturo square e accedo a row e col
+    const { row, col } = square;
+    gameBoard[row][col] = player;
+  }
+  return gameBoard;
+}
+
+function App() {
+  //const [activePlayer, setActivePlayer] = useState("X");
+
+  //stato per il log, all'inizio sarà un array vuoto
+  const [gameTurns, setGameTurns] = useState([]);
+  const [players, setPlayers] = useState(PLAYERS);
+  const currentPlayer = deriveActivePlayer(gameTurns);
+  const gameBoard = deriveGameBoard(gameTurns);
+  const winner = deriveWinner(gameBoard, players);
   const hasDraw = gameTurns.length === 9 && !winner;
+  // si potrebbe usare un nuovo stato per controllare la combinazione vincente, ma non sarebbe best practice, invece usiamo il derive state
+  // const [hasWinner, setHasWinner] = useState(false);
+
+  //funzione per gestire il cambio del nome del giocatore
+  const playerNameHandler = (symbol, newName) => {
+    setPlayers((prevPlayers) => {
+      return {
+        //stiamo ri trasferendo tutte le informazioni inserite prima
+        ...prevPlayers,
+        //questi sono i dati che in maniera dinamica andiamo a sovrascrivere
+        [symbol]: newName,
+      };
+    });
+  };
 
   function handleSelectSquare(rowIndex, colIndex) {
     //funzione riguardante i turni che vogliamo far apparire nei log
@@ -135,13 +157,15 @@ function App() {
         <ol id="players" className="highlight-player">
           <Player
             isActive={currentPlayer === "X"}
-            initialName="Player 1"
+            initialName={PLAYERS.X}
             symbol="X"
+            onNameChange={playerNameHandler}
           />
           <Player
             isActive={currentPlayer === "O"}
-            initialName="Player 2"
+            initialName={PLAYERS.O}
             symbol="O"
+            onNameChange={playerNameHandler}
           />
         </ol>
         {(winner || hasDraw) && (
